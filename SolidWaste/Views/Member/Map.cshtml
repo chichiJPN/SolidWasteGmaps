@@ -1,0 +1,15 @@
+﻿@section CssHeader {
+
+}
+<div id="dataDiv" class="display-none" data-district-url="@Url.Action("getDistricts", "ajax")"></div>
+
+@*<input id="pac-input" class="controls" type="text" placeholder="Search Box">*@
+<div id="map"></div>
+<div id="info"></div>
+@section ScriptsFooter {
+    <script> window.baseUrl = "@string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"))"; </script>
+    <script src="@Url.Content("~/Scripts/jquery-1.8.2.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/google-map.js")" type="text/javascript"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUezPkykFJdiK29b6vLeGvGEyXGOuR_E8&libraries=places,drawing&callback=initAutocomplete" async defer></script>
+    
+}
