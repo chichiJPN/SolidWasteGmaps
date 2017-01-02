@@ -15,7 +15,8 @@ var map,
         route: null
     },
     searchMarkers = [],
-    municipalityMarkers = [];
+    municipalityMarkers = [],
+    accountStatus = null;
 
 function disableMovement(disable) {
     var mapOptions;
@@ -37,35 +38,47 @@ function disableMovement(disable) {
     map.setOptions(mapOptions);
 }
 
-function placeMarker(location, title, id) {
-    if (title === undefined) { title = "No Title"; }
+function placeMarker(location, title, id, searchFlag) {
 
-    var infoContent = helper.createEl('h3', null, { id: 'content' });
-    infoContent.appendChild(helper.createEl('h3', 'firstHeading', { id: 'firstHeading' }, 'Lorry ' + title));
+    var tempmarker;
 
-    var infowindow = new google.maps.InfoWindow({
-        content: infoContent
-    });
+    if (searchFlag == true) {
+        tempmarker = new google.maps.Marker({
+            position: location,
+            icon : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            map: map,
+        });
+    } else {
+        if (title === undefined) { title = "No Title"; }
 
-    var tempmarker = new google.maps.Marker({
-        position: location,
-        title: title,
-        map: map,
-    });
+        var infoContent = helper.createEl('h3', null, { id: 'content' });
+        infoContent.appendChild(helper.createEl('h3', 'firstHeading', { id: 'firstHeading' }, 'Lorry ' + title));
 
-    tempmarker.set('id', id);
+        var infowindow = new google.maps.InfoWindow({
+            content: infoContent
+        });
+
+        tempmarker = new google.maps.Marker({
+            position: location,
+            title: title,
+            map: map,
+        });
+
+        tempmarker.set('id', id);
 
 
-    tempmarker.addListener('click', function () {
-        if (lastToggled.infowindow != null) {
-            lastToggled.infowindow.close();
-        }
-        infowindow.open(map, tempmarker);
-        lastToggled.infowindow = infowindow;
-        lastToggled.marker = tempmarker;
-    });
+        tempmarker.addListener('click', function () {
+            if (lastToggled.infowindow != null) {
+                lastToggled.infowindow.close();
+            }
+            infowindow.open(map, tempmarker);
+            lastToggled.infowindow = infowindow;
+            lastToggled.marker = tempmarker;
+        });
+
+    }
+
     markers.push(tempmarker);
-
 }
 
 function placeMunicipalityMarker(title, id, location, boundary, Address, contactNumber, imageName, numLorries) {
@@ -314,15 +327,10 @@ function addSearch() {
         // For each place, get the icon, name and location.
         var flag = true;
         var bounds = new google.maps.LatLngBounds();
-        console.log('polygon on map is ');
-        console.log(polygonOnMap);
-        console.log('bounds are ');
-        console.log(bounds);
         places.forEach(function (place) {
             if (!place.geometry || !google.maps.geometry.poly.containsLocation(place.geometry.location, polygonOnMap[0])) {
                 return;
             }
-            console.log(place);
             var icon = {
                 url: place.icon,
                 size: new google.maps.Size(71, 71),
@@ -330,20 +338,31 @@ function addSearch() {
                 anchor: new google.maps.Point(17, 34),
                 scaledSize: new google.maps.Size(25, 25)
             };
-            //
-            // Create a marker for each place.
+
+            if (search_flag == true) {
+                markers[markers.length - 1].setMap(null);
+                markers = markers.splice(markers.length - 1, 1);
+                search_flag = false;
+            }
+
             searchMarkers.push(new google.maps.Marker({
                 map: map,
-                icon: icon,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
                 title: place.name,
                 position: place.geometry.location
             }));
+
             if (place.geometry.viewport) {
                 // Only geocodes have viewport.
                 bounds.union(place.geometry.viewport);
             } else {
                 bounds.extend(place.geometry.location);
             }
+
+            $('#home-address').val($('#pac-input').val());
+            $('#home_x').val(place.geometry.location.lat());
+            $('#home_y').val(place.geometry.location.lng());
+            return;
         });
         map.fitBounds(bounds);
     });
@@ -433,6 +452,8 @@ function initAutocomplete() {
         zoomed_y_coor = parseFloat(data.data('y_coor')),
         districtName = data.data('district_name');
 
+    accountStatus = data.data('account-status');
+
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: zoomed_x_coor, lng: zoomed_y_coor },
@@ -482,6 +503,23 @@ function initAutocomplete() {
     });
 
     refresh.routelist('all');
+
+    //zoomed_x_coor
+    switch (accountStatus) {
+        case 'Not Verified':
+            var div = helper.createEl('div'),
+                address_input = helper.createEl('input', 'form-control'),
+                table = helper.createEl('table'),
+                tr = helper.createEl('tr'),
+                x_input = helper.createEl('input', 'form-control'),
+                y_input = helper.createEl('input', 'form-control');
+            break;
+        case 'For Verification':
+            break;
+        case 'Verified':
+            break;
+    }
+
     //enableDrawing();
     //setMarkerOnMapClick();
 
@@ -490,10 +528,34 @@ function initAutocomplete() {
     addSearch();
     document.getElementById('chkbox-showlorries').onclick = btnfuncs.toggleLorryVisibility;
     document.getElementById('chkbox-showmunicipalities').onclick = btnfuncs.toggleMunicipalityVisibility;
+    document.getElementById('btn-placemarker').onclick = btnfuncs.placemarker;
 }
 
-
+var search_flag = false;
 var btnfuncs = {
+    placemarker: function () {
+
+        google.maps.event.addListener(polygonOnMap[0], 'mousemove', function (event) {
+            $('#home_x').val(event.latLng.lat());
+            $('#home_y').val(event.latLng.lng());
+        });
+
+        google.maps.event.addListener(polygonOnMap[0], 'click', function (event) {
+            if (search_flag == true) {
+                markers[markers.length - 1].setMap(null);
+                markers = markers.splice(markers.length - 1, 1);
+            }
+            search_flag = true;
+            placeMarker(event.latLng,null,null, true);
+            google.maps.event.clearListeners(polygonOnMap[0], 'click');
+            google.maps.event.clearListeners(polygonOnMap[0], 'mousemove');
+            console.log(event.latLng);
+
+            $('#home_x').val(event.latLng.lat());
+            $('#home_y').val(event.latLng.lng());
+
+        });
+    },
     toggleLorryVisibility: function () {
         var bool = this.checked == true ? map : null;
         for (var x = 0, length = markers.length; x < length; x++) {

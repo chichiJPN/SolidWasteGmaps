@@ -11,7 +11,10 @@
                 @Html.TextBoxFor(m => m.UserName, new { placeholder ="Enter Username"})
                 @Html.PasswordFor(m => m.Password, new { placeholder = "Enter Password" })
                 @Html.PasswordFor(m => m.ConfirmPassword, new { placeholder = "Repeat Password" })
-
+                @Html.TextBoxFor(m => m.FirstName, new { placeholder = "Enter first name" })
+                @Html.TextBoxFor(m => m.LastName, new { placeholder = "Enter last name" })
+                @*@Html.DropDownList("MovieType")*@
+                @Html.DropDownListFor(m => m.DistrictID, new SelectList(ViewBag.MovieType, "id ","name"))
                 @*<input type="text" placeholder="username"/>
                 <input type="password" placeholder="password"/>*@
                 <button type="submit">Register</button>

@@ -10,6 +10,7 @@
      data-search_xmax="@ViewBag.District.search_xmax"
      data-search_ymin="@ViewBag.District.search_ymin"
      data-search_ymax="@ViewBag.District.search_ymax"
+     data-account-status= "@ViewBag.account.AccountStatus"
      data-district-url="@Url.Action("getMunicipalities", "ajax")"></div>
 
 <div class="sidebar-wrapper">
@@ -19,6 +20,17 @@
             <h4>District @ViewBag.District.Name</h4>
             <p>Municipalities: @ViewBag.numMunicipalities</p>
             <p>Total population of @ViewBag.District.population.</p>
+        </div>
+        <div id="accountDiv">
+            <h3>Your account has not been verified yet. Please search for your address so we can add your coordinates to our system.</h3>
+            <input id="home-address" type="text" class="form-control" placeholder="Address is here" disabled>
+
+            <div class="not-verify-container">
+                <input id="home_x" class="form-control" placeholder="X coordinates" type="text" disabled/>
+                <input id="home_y" class="form-control" placeholder="Y coordinates" type="text" disabled />
+            </div>
+            <p>Marker position not on top of your home? Click <a id="btn-placemarker">here </a>to put it yourself.</p>
+            <button>Save</button>
         </div>
     </div>
     <div class="sidebar-margin">

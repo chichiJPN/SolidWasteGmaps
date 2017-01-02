@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace SolidWaste.Controllers
 {
@@ -50,6 +51,13 @@ namespace SolidWaste.Controllers
                 (from m in _db.Municipalities
                  where m.DistrictID == id
                  select m.DistrictID).Count();
+
+            int userID = (int)Membership.GetUser().ProviderUserKey;
+
+            ViewBag.account =
+            (from m in _db.UserProfiles
+             where m.UserId == userID
+             select m).Single();
 
             if (User.IsInRole("Admin")) {
                 return View("AdminDistrict", model);

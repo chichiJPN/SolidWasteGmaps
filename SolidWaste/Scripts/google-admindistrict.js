@@ -524,15 +524,29 @@ var map,
                         temproute = [];
                     for (var y = 0, length2 = points.length ; y < length2; y++) {
                         var coordinate = points[y].split(',');
-                        temproute.push({ lat: parseFloat(coordinate[0]), lng: parseFloat(coordinate[1]) });
+                        var latlng = new google.maps.LatLng(
+                            parseFloat(coordinate[0]),
+                            parseFloat(coordinate[1]));
+
+                        temproute.push(latlng);
+                        //temproute.push({ lat: parseFloat(coordinate[0]), lng: parseFloat(coordinate[1]) });
+                        //console.log(coordinate[0] + ' , ' + coordinate[1]);
                     }
+                    //var latlng = new google.maps.LatLng(
+                    //    data.snappedPoints[i].location.latitude,
+                    //    data.snappedPoints[i].location.longitude);
+                    //snappedCoordinates.push(latlng);
+
+
                     var routeObject = new google.maps.Polyline({
                         path: temproute,
                         strokeColor: 'black',
                         strokeWeight: 5
                     });
-                    routeObject.set('lat', temproute[0].lat);
-                    routeObject.set('lng', temproute[0].lng);
+                    console.log(temproute[0].lat());
+                    console.log(temproute[0].lng());
+                    routeObject.set('lat', temproute[0].lat());
+                    routeObject.set('lng', temproute[0].lng());
                     routeObject.set('RouteID', returned_routes[x].RouteID);
                     routeObject.set('RouteName', returned_routes[x].RouteName);
                     routeObject.set('DriverID', returned_routes[x].DriverID);
@@ -772,12 +786,16 @@ var map,
             snappedCoordinates = [];
             placeIdArray = [];
             temparray = [];
+
             for (var i = 0; i < data.snappedPoints.length; i++) {
+                //console.log(data.snappedPoint[i].location);
+
                 var latlng = new google.maps.LatLng(
                     data.snappedPoints[i].location.latitude,
                     data.snappedPoints[i].location.longitude);
                 snappedCoordinates.push(latlng);
-                tempArray.push([data.snappedPoints[i].location.latitude.toFixed(4), data.snappedPoints[i].location.longitude.toFixed(4)]);
+                tempArray.push([data.snappedPoints[i].location.latitude, data.snappedPoints[i].location.longitude]);
+
                 placeIdArray.push(data.snappedPoints[i].placeId);
             }
         }

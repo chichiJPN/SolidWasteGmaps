@@ -37,7 +37,6 @@ namespace SolidWaste.Controllers
             {
                 return RedirectToAction("Map", "Member");
             }
-
             // If we got this far, something failed, redisplay form
             ModelState.AddModelError("", "The user name or password provided is incorrect.");
             return View(model);
@@ -61,6 +60,33 @@ namespace SolidWaste.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+
+            SolidWasteDb _db = new SolidWasteDb();
+
+            List<SelectListItem> items = new List<SelectListItem>();
+
+            //items.Add(new SelectListItem { Text = "Action", Value = "0" });
+
+            //items.Add(new SelectListItem { Text = "Drama", Value = "1" });
+
+            //items.Add(new SelectListItem { Text = "Comedy", Value = "2", Selected = true });
+
+            //items.Add(new SelectListItem { Text = "Science Fiction", Value = "3" });
+
+            var foo = _db.Districts
+                    .Select(r => new
+                    {
+                        id = r.DistrictID,
+                        name = r.Name
+                    });
+
+            foreach(var one in foo) {
+                items.Add(new SelectListItem { Text = one.name, Value = one.id.ToString() });
+            }
+
+            ViewBag.MovieType = foo;
+
+
             return View();
         }
 
@@ -78,6 +104,22 @@ namespace SolidWaste.Controllers
                 try
                 {
                     WebSecurity.CreateUserAndAccount(model.UserName, model.Password);
+
+                    SolidWasteDb _db = new SolidWasteDb();
+
+                    UserProfile user = _db.UserProfiles.SingleOrDefault(d => d.UserName == model.UserName);
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.DistrictID = model.DistrictID;
+                    user.AccountStatus = "Not Verified";
+                    _db.SaveChanges();
+
+                    var roles = (SimpleRoleProvider)Roles.Provider;
+                    if (!roles.GetRolesForUser(model.UserName).Contains("Member"))
+                    {
+                        roles.AddUsersToRoles(new[] { model.UserName }, new[] { "Member" });
+                    }
+
                     WebSecurity.Login(model.UserName, model.Password);
                     return RedirectToAction("Index", "Home");
                 }
