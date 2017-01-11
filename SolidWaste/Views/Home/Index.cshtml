@@ -1,0 +1,40 @@
+﻿@*@model IEnumerable<SolidWaste.Models.Role>*@
+
+
+@*<section>
+
+        @foreach (var item in Model)
+        {
+            <div>
+                <h4>@item.RoleID</h4>
+                <h4>@item.Name</h4>
+            </div>
+        }
+    </section>*@
+
+<section class="main-content">
+    <div id="owl-demo" class="owl-carousel owl-theme">
+        <div class="item">
+            <img src="@Url.Content("~/Images/slider-1.jpg")">
+        </div>
+        <div class="item">
+            <img src="@Url.Content("~/Images/slider-1.jpg")">
+        </div>
+        <div class="item">
+            <img src="@Url.Content("~/Images/slider-1.jpg")">
+        </div>
+        <div class="item">
+            <img src="@Url.Content("~/Images/slider-1.jpg")">
+        </div>
+        <div class="item">
+            <img src="@Url.Content("~/Images/slider-1.jpg")">
+        </div>
+        <div class="item">
+            <img src="@Url.Content("~/Images/slider-1.jpg")">
+        </div>
+    </div>
+</section>
+
+@section ScriptsFooter {
+    @Scripts.Render("~/bundles/owlcarousel")
+}
